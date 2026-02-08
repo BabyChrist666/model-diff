@@ -362,6 +362,7 @@ class MockNumpy:
             return data
         return MockArray(data)
 
+    @property
     def random(self):
         return self
 
