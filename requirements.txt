@@ -1,0 +1,14 @@
+# Core dependencies (optional - works without numpy for basic functionality)
+numpy>=1.20.0
+
+# Development dependencies
+pytest>=7.0.0
+pytest-cov>=4.0.0
+black>=23.0.0
+isort>=5.12.0
+mypy>=1.0.0
+flake8>=6.0.0
+
+# Optional: For specific checkpoint formats
+# torch>=1.9.0
+# safetensors>=0.3.0

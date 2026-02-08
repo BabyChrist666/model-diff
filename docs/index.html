@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Diff - Compare Model Checkpoints</title>
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --secondary: #1e293b;
+            --accent: #22d3ee;
+            --bg: #0f172a;
+            --bg-light: #1e293b;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #334155;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        header {
+            background: linear-gradient(135deg, var(--bg-light) 0%, var(--bg) 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--primary); }
+
+        .hero {
+            padding: 100px 0;
+            text-align: center;
+            background: radial-gradient(ellipse at center, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--text) 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-light);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover { border-color: var(--primary); }
+
+        .features {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .section-title p { color: var(--text-muted); }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid var(--border);
+            transition: border-color 0.2s;
+        }
+
+        .feature-card:hover { border-color: var(--primary); }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 { margin-bottom: 10px; }
+        .feature-card p { color: var(--text-muted); font-size: 0.95rem; }
+
+        .metrics-section {
+            padding: 80px 0;
+            background: var(--bg-light);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .metric-card {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .metric-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .patterns {
+            padding: 80px 0;
+        }
+
+        .pattern-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .pattern-card {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid var(--border);
+            display: flex;
+            gap: 15px;
+        }
+
+        .pattern-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .pattern-content h4 { margin-bottom: 5px; }
+        .pattern-content p { color: var(--text-muted); font-size: 0.9rem; }
+
+        .code-section {
+            padding: 80px 0;
+            background: var(--bg-light);
+        }
+
+        .code-block {
+            background: var(--bg);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .code-header {
+            background: rgba(139, 92, 246, 0.1);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .code-header span { color: var(--text-muted); }
+
+        .code-content {
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        pre {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .code-keyword { color: #c678dd; }
+        .code-string { color: #98c379; }
+        .code-function { color: #61afef; }
+        .code-comment { color: #5c6370; }
+
+        .workflow {
+            padding: 80px 0;
+        }
+
+        .workflow-steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .workflow-step {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            border: 1px solid var(--border);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin: 0 auto 15px;
+        }
+
+        .workflow-arrow {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        footer {
+            padding: 40px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        footer p { color: var(--text-muted); }
+        footer a { color: var(--primary); text-decoration: none; }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .features-grid { grid-template-columns: 1fr; }
+            .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+            .pattern-grid { grid-template-columns: 1fr; }
+            .workflow-steps { flex-direction: column; }
+            .workflow-arrow { transform: rotate(90deg); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <div class="logo-icon">⚖️</div>
+                    Model Diff
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#patterns">Patterns</a></li>
+                    <li><a href="#code">Usage</a></li>
+                    <li><a href="https://github.com/BabyChrist666/model-diff">GitHub</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Understand Training Changes</h1>
+            <p>Compare model checkpoints to see exactly what changed during training. Debug issues, analyze fine-tuning, and validate training runs.</p>
+            <div class="btn-group">
+                <a href="#code" class="btn btn-primary">Get Started</a>
+                <a href="https://github.com/BabyChrist666/model-diff" class="btn btn-secondary">View on GitHub</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Comprehensive Analysis</h2>
+                <p>Everything you need to understand model changes</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Multi-Format Support</h3>
+                    <p>Load PyTorch, SafeTensors, NumPy, and HuggingFace checkpoints seamlessly.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📈</div>
+                    <h3>Rich Metrics</h3>
+                    <p>L2 diff, cosine similarity, relative change, and element-wise statistics.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Pattern Detection</h3>
+                    <p>Automatically identify training patterns like gradient flow and layer freezing.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏷️</div>
+                    <h3>Layer Analysis</h3>
+                    <p>Categorize and compare attention, MLP, embedding, and other layer types.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💡</div>
+                    <h3>Training Insights</h3>
+                    <p>Get automated insights about frozen layers, stability, and architecture changes.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📄</div>
+                    <h3>Beautiful Reports</h3>
+                    <p>Generate HTML, JSON, or text reports with visualizations and summaries.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="metrics-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Metrics Computed</h2>
+                <p>For each parameter, we compute comprehensive statistics</p>
+            </div>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">L2</div>
+                    <div class="metric-label">Euclidean Distance</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">cos θ</div>
+                    <div class="metric-label">Cosine Similarity</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">Δ%</div>
+                    <div class="metric-label">Relative Change</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">max</div>
+                    <div class="metric-label">Max Difference</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="patterns" class="patterns">
+        <div class="container">
+            <div class="section-title">
+                <h2>Change Patterns</h2>
+                <p>Automatically detect how your model changed during training</p>
+            </div>
+            <div class="pattern-grid">
+                <div class="pattern-card">
+                    <div class="pattern-icon">📉</div>
+                    <div class="pattern-content">
+                        <h4>Gradient Pattern</h4>
+                        <p>Earlier layers changed more than later layers - common in transfer learning</p>
+                    </div>
+                </div>
+                <div class="pattern-card">
+                    <div class="pattern-icon">📈</div>
+                    <div class="pattern-content">
+                        <h4>Inverse Gradient</h4>
+                        <p>Later layers changed more - typical for fine-tuning on new tasks</p>
+                    </div>
+                </div>
+                <div class="pattern-card">
+                    <div class="pattern-icon">👁️</div>
+                    <div class="pattern-content">
+                        <h4>Attention Heavy</h4>
+                        <p>Attention mechanisms changed most - learning new relationships</p>
+                    </div>
+                </div>
+                <div class="pattern-card">
+                    <div class="pattern-icon">🔢</div>
+                    <div class="pattern-content">
+                        <h4>MLP Heavy</h4>
+                        <p>Feed-forward layers changed most - learning new features</p>
+                    </div>
+                </div>
+                <div class="pattern-card">
+                    <div class="pattern-icon">❄️</div>
+                    <div class="pattern-content">
+                        <h4>Sparse Changes</h4>
+                        <p>Very few layers changed - possible frozen layers or early stopping</p>
+                    </div>
+                </div>
+                <div class="pattern-card">
+                    <div class="pattern-icon">⚖️</div>
+                    <div class="pattern-content">
+                        <h4>Uniform</h4>
+                        <p>All layers changed equally - full model training</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="code" class="code-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Quick Start</h2>
+                <p>Compare checkpoints in just a few lines of code</p>
+            </div>
+            <div class="code-block">
+                <div class="code-header">
+                    <span>Python</span>
+                    <span>example.py</span>
+                </div>
+                <div class="code-content">
+<pre><span class="code-keyword">from</span> model_diff <span class="code-keyword">import</span> compare_checkpoints, DiffAnalyzer, create_diff_report
+
+<span class="code-comment"># Compare two checkpoints</span>
+diffs, summary = <span class="code-function">compare_checkpoints</span>(
+    <span class="code-string">"model_v1.pt"</span>,
+    <span class="code-string">"model_v2.pt"</span>
+)
+
+<span class="code-comment"># Print summary</span>
+<span class="code-function">print</span>(<span class="code-string">f"Modified: </span>{summary.modified_parameters}<span class="code-string">"</span>)
+<span class="code-function">print</span>(<span class="code-string">f"Cosine Similarity: </span>{summary.avg_cosine_similarity:.4f}<span class="code-string">"</span>)
+
+<span class="code-comment"># Analyze the differences</span>
+analyzer = <span class="code-function">DiffAnalyzer</span>()
+analysis = analyzer.<span class="code-function">analyze</span>(diffs, summary)
+
+<span class="code-function">print</span>(<span class="code-string">f"Pattern: </span>{analysis['change_pattern']}<span class="code-string">"</span>)
+
+<span class="code-comment"># Generate HTML report</span>
+report = <span class="code-function">create_diff_report</span>(
+    diffs, summary, analysis,
+    format=<span class="code-string">"html"</span>,
+    old_name=<span class="code-string">"Base"</span>,
+    new_name=<span class="code-string">"Fine-tuned"</span>
+)
+
+<span class="code-keyword">with</span> <span class="code-function">open</span>(<span class="code-string">"report.html"</span>, <span class="code-string">"w"</span>) <span class="code-keyword">as</span> f:
+    f.<span class="code-function">write</span>(report)
+</pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="workflow">
+        <div class="container">
+            <div class="section-title">
+                <h2>Workflow</h2>
+                <p>From checkpoints to insights in four simple steps</p>
+            </div>
+            <div class="workflow-steps">
+                <div class="workflow-step">
+                    <div class="step-number">1</div>
+                    <h4>Load</h4>
+                    <p>Load checkpoints from any format</p>
+                </div>
+                <span class="workflow-arrow">→</span>
+                <div class="workflow-step">
+                    <div class="step-number">2</div>
+                    <h4>Compare</h4>
+                    <p>Compute differences between parameters</p>
+                </div>
+                <span class="workflow-arrow">→</span>
+                <div class="workflow-step">
+                    <div class="step-number">3</div>
+                    <h4>Analyze</h4>
+                    <p>Detect patterns and generate insights</p>
+                </div>
+                <span class="workflow-arrow">→</span>
+                <div class="workflow-step">
+                    <div class="step-number">4</div>
+                    <h4>Report</h4>
+                    <p>Create beautiful visualizations</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>Built for ML Engineers | <a href="https://github.com/BabyChrist666/model-diff">GitHub</a> | MIT License</p>
+        </div>
+    </footer>
+</body>
+</html>
