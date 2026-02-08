@@ -2,7 +2,8 @@
 
 Compare two model checkpoints to understand training changes.
 
-[![Tests](https://github.com/BabyChrist666/model-diff/actions/workflows/tests.yml/badge.svg)](https://github.com/BabyChrist666/model-diff/actions)
+[![Tests](https://github.com/BabyChrist666/model-diff/actions/workflows/tests.yml/badge.svg)](https://github.com/BabyChrist666/model-diff/actions/workflows/tests.yml)
+[![codecov](https://codecov.io/gh/BabyChrist666/model-diff/branch/master/graph/badge.svg)](https://codecov.io/gh/BabyChrist666/model-diff)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
