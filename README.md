@@ -271,3 +271,4 @@ pytest tests/test_diff.py -v
 ## License
 
 MIT License - see LICENSE file for details.
+
